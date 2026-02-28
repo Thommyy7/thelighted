@@ -147,11 +147,7 @@ impl OrderContract {
             total += item.unit_price * item.quantity as i128;
         }
 
-        let count: u64 = env
-            .storage()
-            .instance()
-            .get(&DataKey::Count)
-            .unwrap_or(0);
+        let count: u64 = env.storage().instance().get(&DataKey::Count).unwrap_or(0);
         let id: u64 = count + 1;
         let now = env.ledger().timestamp();
 
@@ -168,27 +164,15 @@ impl OrderContract {
         };
 
         let ttl: u32 = 2_073_600;
-        env.storage()
-            .persistent()
-            .set(&DataKey::Order(id), &order);
+        env.storage().persistent().set(&DataKey::Order(id), &order);
         env.storage()
             .persistent()
             .extend_ttl(&DataKey::Order(id), ttl, ttl);
 
         // Append to restaurant index.
-        Self::append_to_list(
-            &env,
-            DataKey::RestaurantOrders(restaurant_id),
-            id,
-            ttl,
-        );
+        Self::append_to_list(&env, DataKey::RestaurantOrders(restaurant_id), id, ttl);
         // Append to customer index.
-        Self::append_to_list(
-            &env,
-            DataKey::CustomerOrders(customer.clone()),
-            id,
-            ttl,
-        );
+        Self::append_to_list(&env, DataKey::CustomerOrders(customer.clone()), id, ttl);
 
         env.storage().instance().set(&DataKey::Count, &id);
         env.storage().instance().extend_ttl(17_280, 17_280);

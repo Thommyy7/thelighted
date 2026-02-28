@@ -11,9 +11,7 @@
 
 #![no_std]
 
-use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, Address, Env, String,
-};
+use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, String};
 
 // ---------------------------------------------------------------------------
 // Storage types
@@ -98,11 +96,7 @@ impl RestaurantRegistry {
             panic!("owner already has a restaurant");
         }
 
-        let count: u64 = env
-            .storage()
-            .instance()
-            .get(&DataKey::Count)
-            .unwrap_or(0);
+        let count: u64 = env.storage().instance().get(&DataKey::Count).unwrap_or(0);
         let id: u64 = count + 1;
 
         let restaurant = Restaurant {

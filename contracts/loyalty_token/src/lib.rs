@@ -137,10 +137,8 @@ impl LoyaltyToken {
             .set(&DataKey::TotalSupply, &(supply + amount));
         env.storage().instance().extend_ttl(17_280, 17_280);
 
-        env.events().publish(
-            (symbol_short!("mint"), symbol_short!("BITE")),
-            (to, amount),
-        );
+        env.events()
+            .publish((symbol_short!("mint"), symbol_short!("BITE")), (to, amount));
     }
 
     /// Update the authorised minter address (admin only).
@@ -219,13 +217,7 @@ impl LoyaltyToken {
     }
 
     /// Transfer `amount` on behalf of `from` using a prior allowance.
-    pub fn transfer_from(
-        env: Env,
-        spender: Address,
-        from: Address,
-        to: Address,
-        amount: i128,
-    ) {
+    pub fn transfer_from(env: Env, spender: Address, from: Address, to: Address, amount: i128) {
         spender.require_auth();
 
         let current = Self::get_allowance(&env, &from, &spender);
@@ -235,14 +227,14 @@ impl LoyaltyToken {
 
         // Decrement allowance.
         let allowance_key = DataKey::Allowance(from.clone(), spender.clone());
-        let mut data: AllowanceData = env
-            .storage()
-            .temporary()
-            .get(&allowance_key)
-            .unwrap_or(AllowanceData {
-                amount: 0,
-                expiration_ledger: 0,
-            });
+        let mut data: AllowanceData =
+            env.storage()
+                .temporary()
+                .get(&allowance_key)
+                .unwrap_or(AllowanceData {
+                    amount: 0,
+                    expiration_ledger: 0,
+                });
         data.amount -= amount;
         env.storage().temporary().set(&allowance_key, &data);
 
@@ -265,14 +257,14 @@ impl LoyaltyToken {
         }
 
         let allowance_key = DataKey::Allowance(from.clone(), spender.clone());
-        let mut data: AllowanceData = env
-            .storage()
-            .temporary()
-            .get(&allowance_key)
-            .unwrap_or(AllowanceData {
-                amount: 0,
-                expiration_ledger: 0,
-            });
+        let mut data: AllowanceData =
+            env.storage()
+                .temporary()
+                .get(&allowance_key)
+                .unwrap_or(AllowanceData {
+                    amount: 0,
+                    expiration_ledger: 0,
+                });
         data.amount -= amount;
         env.storage().temporary().set(&allowance_key, &data);
 

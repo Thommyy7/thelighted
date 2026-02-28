@@ -24,9 +24,7 @@
 
 #![no_std]
 
-use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, token, Address, Env,
-};
+use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, token, Address, Env};
 
 // ---------------------------------------------------------------------------
 // Types
@@ -144,11 +142,7 @@ impl PaymentContract {
             panic!("amount must be positive");
         }
 
-        let fee_bps: u32 = env
-            .storage()
-            .instance()
-            .get(&DataKey::FeeBps)
-            .unwrap_or(0);
+        let fee_bps: u32 = env.storage().instance().get(&DataKey::FeeBps).unwrap_or(0);
         let fee_amount: i128 = (amount * fee_bps as i128) / 10_000;
 
         // Pull funds from payer into this contract.
@@ -354,16 +348,21 @@ mod test {
     use soroban_sdk::{token, Env, IntoVal};
 
     /// Helper: create a token contract and mint `amount` to `recipient`.
-    fn create_token(
-        env: &Env,
-        admin: &Address,
-    ) -> (Address, token::StellarAssetClient<'_>) {
-        let token_addr = env.register_stellar_asset_contract_v2(admin.clone()).address();
+    fn create_token(env: &Env, admin: &Address) -> (Address, token::StellarAssetClient<'_>) {
+        let token_addr = env
+            .register_stellar_asset_contract_v2(admin.clone())
+            .address();
         let sac = token::StellarAssetClient::new(env, &token_addr);
         (token_addr, sac)
     }
 
-    fn setup() -> (Env, PaymentContractClient<'static>, Address, Address, Address) {
+    fn setup() -> (
+        Env,
+        PaymentContractClient<'static>,
+        Address,
+        Address,
+        Address,
+    ) {
         let env = Env::default();
         env.mock_all_auths();
         let cid = env.register_contract(None, PaymentContract);
